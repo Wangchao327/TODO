@@ -1,7 +1,6 @@
 $launcher = Join-Path $PSScriptRoot "launch.bat"
 $desktop = [Environment]::GetFolderPath("Desktop")
 $shortcut = Join-Path $desktop "TODO.lnk"
-$startup = [Environment]::GetFolderPath("Startup")
 
 if (-not (Test-Path $launcher)) {
     Write-Host "[ERROR] launch.bat not found." -ForegroundColor Red
@@ -30,20 +29,14 @@ $s.Save()
 
 Write-Host "       OK." -ForegroundColor Green
 
-Write-Host "[2/3] Adding to startup folder..."
-try {
-    Copy-Item $shortcut $startup -ErrorAction Stop
-    Write-Host "       OK." -ForegroundColor Green
-} catch {
-    Write-Host "[WARN] Could not add to startup. $($_.Exception.Message)" -ForegroundColor Yellow
-}
-
-Write-Host "[3/3] Done!"
+Write-Host "[2/2] Done!"
 Write-Host ""
 Write-Host "--------------------------------------------"
-Write-Host "  Shortcut created on Desktop."
-Write-Host "  Will auto-launch on next Windows boot."
+Write-Host "  Desktop shortcut created."
+Write-Host "  Double-click to open TODO app."
 Write-Host "--------------------------------------------"
+Write-Host ""
+Write-Host "Tip: drag to taskbar to pin for quick access."
 Write-Host ""
 Write-Host "Launching now..."
 Start-Process $launcher
