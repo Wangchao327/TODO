@@ -20,15 +20,17 @@ function parseDate(str) {
   return new Date(y, m - 1, d)
 }
 
-function StatCard({ label, value, unit, icon: Icon, iconColor }) {
+function StatCard({ label, value, unit, icon: Icon, iconBg, iconColor }) {
   return (
-    <div className="bg-gray-50 rounded-xl p-3 text-center">
-      <Icon size={16} className={`mx-auto mb-1 ${iconColor}`} />
-      <p className="text-lg font-semibold text-gray-800">
+    <div className="bg-stone-50 rounded-xl p-3 text-center">
+      <div className={`w-7 h-7 rounded-full ${iconBg} flex items-center justify-center mx-auto mb-1.5`}>
+        <Icon size={14} className={iconColor} />
+      </div>
+      <p className="text-lg font-semibold text-stone-800">
         {value}
-        <span className="text-[11px] text-gray-400 ml-0.5">{unit}</span>
+        <span className="text-[11px] text-stone-400 ml-0.5">{unit}</span>
       </p>
-      <p className="text-[11px] text-gray-400 mt-0.5">{label}</p>
+      <p className="text-[11px] text-stone-400 mt-0.5">{label}</p>
     </div>
   )
 }
@@ -52,8 +54,8 @@ function CalendarHeatmap({ history, todayStr }) {
   }, [history, todayStr])
 
   const getColor = (rate) => {
-    if (rate < 0) return 'bg-gray-100'
-    if (rate === 0) return 'bg-gray-200'
+    if (rate < 0) return 'bg-stone-100'
+    if (rate === 0) return 'bg-stone-200'
     if (rate <= 0.25) return 'bg-teal-100'
     if (rate <= 0.5) return 'bg-teal-200'
     if (rate <= 0.75) return 'bg-teal-300'
@@ -78,10 +80,7 @@ function CalendarHeatmap({ history, todayStr }) {
       <div className="inline-flex gap-0.5">
         <div className="flex flex-col gap-0.5 mr-1">
           {WEEKDAYS.map((label, i) => (
-            <div
-              key={i}
-              className="w-5 h-3 text-[10px] text-gray-300 flex items-center justify-end pr-1"
-            >
+            <div key={i} className="w-5 h-3 text-[10px] text-stone-300 flex items-center justify-end pr-1">
               {label}
             </div>
           ))}
@@ -127,10 +126,10 @@ function TrendChart({ history }) {
     if (active && payload && payload.length) {
       const d = payload[0].payload
       return (
-        <div className="bg-white rounded-lg shadow-md px-3 py-2 text-xs border border-gray-100">
-          <p className="text-gray-500">{label}</p>
+        <div className="bg-white rounded-lg shadow-lg px-3 py-2 text-xs border border-stone-100">
+          <p className="text-stone-500">{label}</p>
           <p className="text-teal-600 font-medium">{d.rate}% 完成率</p>
-          <p className="text-gray-400">{d.completed}/{d.total} 项</p>
+          <p className="text-stone-400">{d.completed}/{d.total} 项</p>
         </div>
       )
     }
@@ -141,16 +140,16 @@ function TrendChart({ history }) {
     <div className="h-40">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
           <XAxis
             dataKey="date"
-            tick={{ fontSize: 10, fill: '#9ca3af' }}
+            tick={{ fontSize: 10, fill: '#a8a29e' }}
             axisLine={false}
             tickLine={false}
             interval={2}
           />
           <YAxis
-            tick={{ fontSize: 10, fill: '#9ca3af' }}
+            tick={{ fontSize: 10, fill: '#a8a29e' }}
             axisLine={false}
             tickLine={false}
             domain={[0, 100]}
@@ -233,24 +232,24 @@ export default function StatsPanel({ history }) {
   }, [history])
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm">
+    <div className="bg-white rounded-2xl shadow-sm ring-1 ring-stone-100">
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center justify-between p-5 cursor-pointer"
       >
-        <h2 className="text-base font-semibold text-gray-800">数据统计</h2>
+        <h2 className="text-sm font-semibold text-stone-700">数据统计</h2>
         <div className="flex items-center gap-4">
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-stone-400">
             <Flame size={12} className="inline mr-0.5 text-orange-400" />
             {stats.streak}天
           </span>
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-stone-400">
             <CheckCircle2 size={12} className="inline mr-0.5 text-teal-400" />
             {stats.totalCompleted}
           </span>
           <ChevronDown
             size={16}
-            className={`text-gray-300 transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
+            className={`text-stone-300 transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
           />
         </div>
       </button>
@@ -262,19 +261,19 @@ export default function StatsPanel({ history }) {
       >
         <div className="px-5 pb-5 space-y-5">
           <div className="grid grid-cols-2 gap-3">
-            <StatCard label="连续打卡" value={stats.streak} unit="天" icon={Flame} iconColor="text-orange-400" />
-            <StatCard label="最长连续" value={stats.bestStreak} unit="天" icon={Trophy} iconColor="text-amber-400" />
-            <StatCard label="累计任务" value={stats.totalTasks} unit="项" icon={ListTodo} iconColor="text-teal-400" />
-            <StatCard label="累计完成" value={stats.totalCompleted} unit="项" icon={CheckCircle2} iconColor="text-teal-400" />
+            <StatCard label="连续打卡" value={stats.streak} unit="天" icon={Flame} iconBg="bg-orange-100" iconColor="text-orange-500" />
+            <StatCard label="最长连续" value={stats.bestStreak} unit="天" icon={Trophy} iconBg="bg-amber-100" iconColor="text-amber-600" />
+            <StatCard label="累计任务" value={stats.totalTasks} unit="项" icon={ListTodo} iconBg="bg-teal-100" iconColor="text-teal-600" />
+            <StatCard label="累计完成" value={stats.totalCompleted} unit="项" icon={CheckCircle2} iconBg="bg-teal-100" iconColor="text-teal-600" />
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-3">打卡日历</h3>
+            <h3 className="text-[13px] font-medium text-stone-500 mb-3">打卡日历</h3>
             <CalendarHeatmap history={history} todayStr={getTodayString()} />
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-3">近两周趋势</h3>
+            <h3 className="text-[13px] font-medium text-stone-500 mb-3">近两周趋势</h3>
             <TrendChart history={history} />
           </div>
         </div>

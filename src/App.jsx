@@ -63,8 +63,15 @@ export default function App() {
   if (loading) return <AppLoading />
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="sticky top-0 z-20 bg-gray-50/80 backdrop-blur-md px-4 pt-5 pb-2">
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: '#fafaf9',
+        backgroundImage: 'radial-gradient(#d6d3d1 0.5px, transparent 0.5px)',
+        backgroundSize: '18px 18px',
+      }}
+    >
+      <div className="sticky top-0 z-20 px-4 pt-5 pb-2" style={{ backgroundColor: 'rgba(250,250,249,0.8)', backdropFilter: 'blur(12px)' }}>
         <div className="max-w-md mx-auto">
           <Header total={total} completed={completed} motivation={motivation} />
         </div>

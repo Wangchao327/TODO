@@ -13,7 +13,7 @@ const CATEGORY_DOT = {
 const PRIORITY_BADGE = {
   high: 'bg-red-50 text-red-500 border-red-200',
   medium: 'bg-amber-50 text-amber-500 border-amber-200',
-  low: 'bg-gray-50 text-gray-400 border-gray-200',
+  low: 'bg-stone-50 text-stone-400 border-stone-200',
 }
 
 export default function TaskItem({ task, onToggle, onUpdate, onDelete, isDragging, isDeleting, isCompleting }) {
@@ -68,11 +68,13 @@ export default function TaskItem({ task, onToggle, onUpdate, onDelete, isDraggin
       ref={setNodeRef}
       style={style}
       {...attributes}
-      className={`bg-white rounded-2xl px-3 py-3.5 shadow-sm flex items-center gap-3 group transition-shadow hover:shadow-md animate-task-enter ${isDeleting ? 'animate-task-exit pointer-events-none' : ''}`}
+      className={`rounded-2xl px-3 py-3.5 shadow-sm flex items-center gap-3 group transition-all duration-300 hover:shadow-md animate-task-enter ${
+        isCompleting ? 'bg-teal-50/80' : 'bg-white'
+      } ${isDeleting ? 'animate-task-exit pointer-events-none' : ''}`}
     >
       <button
         {...listeners}
-        className={`flex-shrink-0 text-gray-300 hover:text-gray-400 cursor-grab active:cursor-grabbing transition-opacity p-0.5 touch-none ${
+        className={`flex-shrink-0 text-stone-300 hover:text-stone-400 cursor-grab active:cursor-grabbing transition-opacity p-0.5 touch-none ${
           task.completed || isDeleting ? 'opacity-0 pointer-events-none' : 'opacity-30 group-hover:opacity-100'
         }`}
         tabIndex={-1}
@@ -88,7 +90,7 @@ export default function TaskItem({ task, onToggle, onUpdate, onDelete, isDraggin
         {task.completed ? (
           <CheckCircle2 size={20} className={`text-teal-500 ${isCompleting ? 'animate-bounce-in' : ''}`} />
         ) : (
-          <Circle size={20} className="text-gray-300 hover:text-teal-400 transition-colors" />
+          <Circle size={20} className="text-stone-300 hover:text-teal-400 transition-colors" />
         )}
       </button>
 
@@ -105,13 +107,13 @@ export default function TaskItem({ task, onToggle, onUpdate, onDelete, isDraggin
             onChange={(e) => setEditText(e.target.value)}
             onBlur={handleSaveEdit}
             onKeyDown={handleEditKeyDown}
-            className="w-full text-sm text-gray-700 outline-none bg-transparent border-b border-teal-400 pb-0.5"
+            className="w-full text-sm text-stone-700 outline-none bg-transparent border-b border-teal-400 pb-0.5"
           />
         ) : (
           <span
             onDoubleClick={handleDoubleClick}
             className={`block text-sm select-none transition-all duration-300 truncate ${
-              task.completed ? 'text-gray-400 line-through cursor-default' : 'text-gray-700 cursor-text'
+              task.completed ? 'text-stone-400 line-through cursor-default' : 'text-stone-700 cursor-text'
             }`}
           >
             {task.text}
@@ -129,7 +131,7 @@ export default function TaskItem({ task, onToggle, onUpdate, onDelete, isDraggin
 
       <button
         onClick={() => onDelete(task.id)}
-        className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-300 hover:text-red-400 p-1 cursor-pointer"
+        className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-stone-300 hover:text-red-400 p-1 cursor-pointer"
         disabled={isDeleting}
       >
         <Trash2 size={15} />

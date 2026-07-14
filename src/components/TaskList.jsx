@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
-import { Circle, CheckCheck, Trash2 } from 'lucide-react'
+import { CheckCheck, Trash2 } from 'lucide-react'
 import TaskItem from './TaskItem'
 
 const CATEGORIES = [
@@ -64,12 +64,14 @@ export default function TaskList({
 
   if (tasks.length === 0) {
     return (
-      <div className="text-center py-16">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-          <Circle size={28} className="text-gray-300" />
+      <div className="text-center py-20">
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-teal-50 to-teal-100 mb-5">
+          <div className="w-10 h-10 rounded-full border-2 border-teal-300 flex items-center justify-center">
+            <CheckCheck size={20} className="text-teal-400" />
+          </div>
         </div>
-        <p className="text-gray-300">还没有任务</p>
-        <p className="text-gray-300 text-sm mt-1">添加第一个待办开始吧</p>
+        <p className="text-stone-400 font-medium">还没有任务</p>
+        <p className="text-stone-300 text-sm mt-1.5">点击上方输入框，添加你的第一个待办</p>
       </div>
     )
   }
@@ -84,7 +86,7 @@ export default function TaskList({
             className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
               categoryFilter === cat.key
                 ? 'bg-teal-500 text-white shadow-md'
-                : 'bg-white text-gray-400 hover:text-gray-600 hover:bg-gray-50 shadow-sm'
+                : 'bg-white text-stone-400 hover:text-stone-600 hover:bg-stone-100 shadow-sm'
             }`}
           >
             {cat.label}
@@ -106,7 +108,7 @@ export default function TaskList({
           {hasCompleted && (
             <button
               onClick={onClearCompleted}
-              className="flex-1 flex items-center justify-center gap-1.5 bg-white rounded-xl py-2 text-xs text-gray-400 font-medium hover:text-red-500 hover:bg-red-50 transition-colors shadow-sm cursor-pointer"
+              className="flex-1 flex items-center justify-center gap-1.5 bg-white rounded-xl py-2 text-xs text-stone-400 font-medium hover:text-red-500 hover:bg-red-50 transition-colors shadow-sm cursor-pointer"
             >
               <Trash2 size={13} />
               清除已完成
@@ -124,7 +126,7 @@ export default function TaskList({
         <SortableContext items={incompleteIds} strategy={verticalListSortingStrategy}>
           <div className="space-y-2.5">
             {filteredTasks.length === 0 ? (
-              <p className="text-center text-gray-300 text-sm py-8 animate-task-enter">该分类下暂无任务</p>
+              <p className="text-center text-stone-300 text-sm py-8 animate-task-enter">该分类下暂无任务</p>
             ) : (
               incompleteIds.map((id) => {
                 const task = filteredTasks.find((t) => t.id === id)
@@ -148,7 +150,7 @@ export default function TaskList({
         {completedIds.length > 0 && (
           <div className="mt-4 space-y-2.5">
             {incompleteIds.length > 0 && (
-              <p className="text-xs text-gray-300 pl-1">已完成 ({completedIds.length})</p>
+              <p className="text-[11px] font-medium text-stone-400 pl-1">已完成 ({completedIds.length})</p>
             )}
             {completedIds.map((id) => {
               const task = filteredTasks.find((t) => t.id === id)

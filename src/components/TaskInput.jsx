@@ -2,16 +2,16 @@ import { useState, useRef } from 'react'
 import { Plus } from 'lucide-react'
 
 const CATEGORIES = [
-  { key: 'work', label: '工作', active: 'bg-blue-500 text-white', inactive: 'bg-gray-100 text-gray-400 hover:bg-gray-200' },
-  { key: 'study', label: '学习', active: 'bg-amber-500 text-white', inactive: 'bg-gray-100 text-gray-400 hover:bg-gray-200' },
-  { key: 'life', label: '生活', active: 'bg-teal-500 text-white', inactive: 'bg-gray-100 text-gray-400 hover:bg-gray-200' },
-  { key: 'sport', label: '运动', active: 'bg-rose-500 text-white', inactive: 'bg-gray-100 text-gray-400 hover:bg-gray-200' },
+  { key: 'work', label: '工作', active: 'bg-blue-500 text-white', inactive: 'bg-stone-100 text-stone-400 hover:bg-stone-200' },
+  { key: 'study', label: '学习', active: 'bg-amber-500 text-white', inactive: 'bg-stone-100 text-stone-400 hover:bg-stone-200' },
+  { key: 'life', label: '生活', active: 'bg-teal-500 text-white', inactive: 'bg-stone-100 text-stone-400 hover:bg-stone-200' },
+  { key: 'sport', label: '运动', active: 'bg-rose-500 text-white', inactive: 'bg-stone-100 text-stone-400 hover:bg-stone-200' },
 ]
 
 const PRIORITIES = [
-  { key: 'high', label: '高', active: 'bg-red-500 text-white', inactive: 'bg-gray-100 text-gray-400 hover:bg-gray-200' },
-  { key: 'medium', label: '中', active: 'bg-amber-500 text-white', inactive: 'bg-gray-100 text-gray-400 hover:bg-gray-200' },
-  { key: 'low', label: '低', active: 'bg-gray-500 text-white', inactive: 'bg-gray-100 text-gray-400 hover:bg-gray-200' },
+  { key: 'high', label: '高', active: 'bg-red-500 text-white', inactive: 'bg-stone-100 text-stone-400 hover:bg-stone-200' },
+  { key: 'medium', label: '中', active: 'bg-amber-500 text-white', inactive: 'bg-stone-100 text-stone-400 hover:bg-stone-200' },
+  { key: 'low', label: '低', active: 'bg-stone-600 text-white', inactive: 'bg-stone-100 text-stone-400 hover:bg-stone-200' },
 ]
 
 export default function TaskInput({ onAdd }) {
@@ -35,7 +35,7 @@ export default function TaskInput({ onAdd }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-4">
+    <div className="bg-white rounded-2xl shadow-md ring-1 ring-stone-200/60 p-4">
       <div className="flex gap-2">
         <input
           ref={inputRef}
@@ -44,7 +44,7 @@ export default function TaskInput({ onAdd }) {
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="今天你想完成什么？"
-          className="flex-1 bg-gray-50 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-300 outline-none focus:ring-2 focus:ring-teal-400/50 transition-all"
+          className="flex-1 bg-stone-50 rounded-xl px-4 py-3 text-sm text-stone-700 placeholder-stone-400 outline-none focus:ring-2 focus:ring-teal-400/50 transition-all"
         />
         <button
           onClick={handleSubmit}
@@ -69,7 +69,7 @@ export default function TaskInput({ onAdd }) {
             </button>
           ))}
         </div>
-        <div className="w-px h-5 bg-gray-200" />
+        <div className="w-px h-5 bg-stone-200" />
         <div className="flex gap-1">
           {PRIORITIES.map((p) => (
             <button
