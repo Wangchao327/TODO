@@ -1,7 +1,7 @@
 export default function AppLoading() {
   return (
     <div className="min-h-screen px-4 py-8" style={{ backgroundColor: '#fafaf9', backgroundImage: 'radial-gradient(#d6d3d1 0.5px, transparent 0.5px)', backgroundSize: '18px 18px' }}>
-      <div className="max-w-md mx-auto space-y-5">
+      <div className="max-w-lg mx-auto space-y-5">
         <div className="bg-white rounded-2xl shadow-sm p-5">
           <div className="flex items-end justify-between">
             <div className="h-5 bg-stone-100 rounded w-32 animate-pulse" />

@@ -177,7 +177,7 @@ function TrendChart({ history }) {
 }
 
 export default function StatsPanel({ history }) {
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(true)
 
   const stats = useMemo(() => {
     const entries = Object.entries(history)
