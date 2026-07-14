@@ -16,7 +16,7 @@ const PRIORITY_BADGE = {
   low: 'bg-gray-50 text-gray-400 border-gray-200',
 }
 
-export default function TaskItem({ task, onToggle, onUpdate, onDelete, isDragging }) {
+export default function TaskItem({ task, onToggle, onUpdate, onDelete, isDragging, isDeleting, isCompleting }) {
   const [editing, setEditing] = useState(false)
   const [editText, setEditText] = useState(task.text)
   const inputRef = useRef(null)
@@ -27,7 +27,7 @@ export default function TaskItem({ task, onToggle, onUpdate, onDelete, isDraggin
     setNodeRef,
     transform,
     transition,
-  } = useSortable({ id: task.id, disabled: task.completed })
+  } = useSortable({ id: task.id, disabled: task.completed || isDeleting })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -68,12 +68,12 @@ export default function TaskItem({ task, onToggle, onUpdate, onDelete, isDraggin
       ref={setNodeRef}
       style={style}
       {...attributes}
-      className="bg-white rounded-2xl px-3 py-3.5 shadow-sm flex items-center gap-3 group transition-shadow hover:shadow-md"
+      className={`bg-white rounded-2xl px-3 py-3.5 shadow-sm flex items-center gap-3 group transition-shadow hover:shadow-md animate-task-enter ${isDeleting ? 'animate-task-exit pointer-events-none' : ''}`}
     >
       <button
         {...listeners}
         className={`flex-shrink-0 text-gray-300 hover:text-gray-400 cursor-grab active:cursor-grabbing transition-opacity p-0.5 touch-none ${
-          task.completed ? 'opacity-0 pointer-events-none' : 'opacity-30 group-hover:opacity-100'
+          task.completed || isDeleting ? 'opacity-0 pointer-events-none' : 'opacity-30 group-hover:opacity-100'
         }`}
         tabIndex={-1}
       >
@@ -82,10 +82,11 @@ export default function TaskItem({ task, onToggle, onUpdate, onDelete, isDraggin
 
       <button
         onClick={() => onToggle(task.id)}
-        className="flex-shrink-0 transition-transform duration-200 hover:scale-110 cursor-pointer"
+        className="flex-shrink-0 cursor-pointer"
+        disabled={isDeleting}
       >
         {task.completed ? (
-          <CheckCircle2 size={20} className="text-teal-500" />
+          <CheckCircle2 size={20} className={`text-teal-500 ${isCompleting ? 'animate-bounce-in' : ''}`} />
         ) : (
           <Circle size={20} className="text-gray-300 hover:text-teal-400 transition-colors" />
         )}
@@ -129,6 +130,7 @@ export default function TaskItem({ task, onToggle, onUpdate, onDelete, isDraggin
       <button
         onClick={() => onDelete(task.id)}
         className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-300 hover:text-red-400 p-1 cursor-pointer"
+        disabled={isDeleting}
       >
         <Trash2 size={15} />
       </button>

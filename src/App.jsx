@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import confetti from 'canvas-confetti'
 import Header from './components/Header'
 import TaskInput from './components/TaskInput'
 import TaskList from './components/TaskList'
 import StatsPanel from './components/StatsPanel'
 import Toast from './components/Toast'
+import AppLoading from './components/AppLoading'
 import useTodo from './hooks/useTodo'
 
 export default function App() {
@@ -23,11 +24,24 @@ export default function App() {
     hasIncomplete,
     motivation,
     history,
+    deletingIds,
+    completingIds,
   } = useTodo()
 
   const [categoryFilter, setCategoryFilter] = useState(null)
+  const [loading, setLoading] = useState(() => !sessionStorage.getItem('app-loaded'))
   const completed = sortedTasks.filter((t) => t.completed).length
   const total = sortedTasks.length
+
+  useEffect(() => {
+    if (loading) {
+      const t = setTimeout(() => {
+        setLoading(false)
+        sessionStorage.setItem('app-loaded', '1')
+      }, 500)
+      return () => clearTimeout(t)
+    }
+  }, [loading])
 
   const handleCelebrate = useCallback(() => {
     confetti({
@@ -45,6 +59,8 @@ export default function App() {
       })
     }, 200)
   }, [])
+
+  if (loading) return <AppLoading />
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -70,6 +86,8 @@ export default function App() {
             categoryFilter={categoryFilter}
             onCategoryFilter={setCategoryFilter}
             onCelebrate={handleCelebrate}
+            deletingIds={deletingIds}
+            completingIds={completingIds}
           />
           <StatsPanel history={history} />
         </div>

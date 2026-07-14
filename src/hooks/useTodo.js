@@ -36,7 +36,10 @@ export default function useTodo() {
     MOTIVATIONS[Math.floor(Math.random() * MOTIVATIONS.length)],
   )
   const [undoTask, setUndoTask] = useState(null)
+  const [deletingIds, setDeletingIds] = useState(new Set())
+  const [completingIds, setCompletingIds] = useState(new Set())
   const undoTimer = useRef(null)
+  const deleteTimers = useRef({})
 
   useEffect(() => {
     const today = getTodayString()
@@ -89,9 +92,18 @@ export default function useTodo() {
 
   const toggleTask = useCallback(
     (id) => {
-      setTasks((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)),
-      )
+      setTasks((prev) => {
+        const task = prev.find((t) => t.id === id)
+        if (task && !task.completed) {
+          setCompletingIds((s) => new Set([...s, id]))
+          setTimeout(() => setCompletingIds((s) => {
+            const n = new Set(s)
+            n.delete(id)
+            return n
+          }), 400)
+        }
+        return prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+      })
     },
     [setTasks],
   )
@@ -107,26 +119,51 @@ export default function useTodo() {
 
   const deleteTask = useCallback(
     (id) => {
-      setTasks((prev) => {
-        const target = prev.find((t) => t.id === id)
-        if (target) {
-          setUndoTask(target)
-          if (undoTimer.current) clearTimeout(undoTimer.current)
-          undoTimer.current = setTimeout(() => setUndoTask(null), 3000)
-          return prev.filter((t) => t.id !== id)
-        }
-        return prev
-      })
+      const target = tasks.find((t) => t.id === id)
+      if (!target) return
+
+      setUndoTask(target)
+      setDeletingIds((d) => new Set([...d, id]))
+
+      if (undoTimer.current) clearTimeout(undoTimer.current)
+
+      const tid = setTimeout(() => {
+        setTasks((p) => p.filter((t) => t.id !== id))
+        setDeletingIds((d) => {
+          const next = new Set(d)
+          next.delete(id)
+          return next
+        })
+        delete deleteTimers.current[id]
+      }, 250)
+      deleteTimers.current[id] = tid
+
+      undoTimer.current = setTimeout(() => setUndoTask(null), 3250)
     },
-    [setTasks],
+    [tasks, setTasks],
   )
 
   const undoDelete = useCallback(() => {
-    if (undoTask) {
-      setTasks((prev) => [...prev, undoTask])
-      setUndoTask(null)
-      if (undoTimer.current) clearTimeout(undoTimer.current)
+    if (!undoTask) return
+    const id = undoTask.id
+
+    if (deleteTimers.current[id]) {
+      clearTimeout(deleteTimers.current[id])
+      delete deleteTimers.current[id]
     }
+
+    setDeletingIds((d) => {
+      const next = new Set(d)
+      next.delete(id)
+      return next
+    })
+
+    setTasks((p) => {
+      if (p.find((t) => t.id === id)) return p
+      return [...p, undoTask]
+    })
+    setUndoTask(null)
+    if (undoTimer.current) clearTimeout(undoTimer.current)
   }, [undoTask, setTasks])
 
   const reorderTasks = useCallback(
@@ -174,5 +211,7 @@ export default function useTodo() {
     hasIncomplete,
     motivation,
     history,
+    deletingIds,
+    completingIds,
   }
 }

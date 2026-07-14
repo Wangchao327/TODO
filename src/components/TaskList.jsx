@@ -26,6 +26,8 @@ export default function TaskList({
   categoryFilter,
   onCategoryFilter,
   onCelebrate,
+  deletingIds,
+  completingIds,
 }) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 
@@ -95,7 +97,7 @@ export default function TaskList({
           {hasIncomplete && (
             <button
               onClick={onCompleteAll}
-              className="flex-1 flex items-center justify-center gap-1.5 bg-white rounded-xl py-2 text-xs text-teal-600 font-medium hover:bg-teal-50 transition-colors shadow-sm cursor-pointer"
+              className="flex-1 flex items-center justify-center gap-1.5 bg-white rounded-xl py-2 text-xs text-teal-600 font-medium hover:bg-teal-50 active:animate-spin-once transition-colors shadow-sm cursor-pointer"
             >
               <CheckCheck size={14} />
               全部完成
@@ -122,7 +124,7 @@ export default function TaskList({
         <SortableContext items={incompleteIds} strategy={verticalListSortingStrategy}>
           <div className="space-y-2.5">
             {filteredTasks.length === 0 ? (
-              <p className="text-center text-gray-300 text-sm py-8">该分类下暂无任务</p>
+              <p className="text-center text-gray-300 text-sm py-8 animate-task-enter">该分类下暂无任务</p>
             ) : (
               incompleteIds.map((id) => {
                 const task = filteredTasks.find((t) => t.id === id)
@@ -134,6 +136,8 @@ export default function TaskList({
                     onToggle={onToggle}
                     onUpdate={onUpdate}
                     onDelete={onDelete}
+                    isDeleting={deletingIds?.has(task.id)}
+                    isCompleting={completingIds?.has(task.id)}
                   />
                 )
               })
@@ -156,6 +160,8 @@ export default function TaskList({
                   onToggle={onToggle}
                   onUpdate={onUpdate}
                   onDelete={onDelete}
+                  isDeleting={deletingIds?.has(task.id)}
+                  isCompleting={completingIds?.has(task.id)}
                 />
               )
             })}
