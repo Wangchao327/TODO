@@ -9,7 +9,7 @@ const MOTIVATIONS = [
   '今日事，今日毕。',
 ]
 
-function getTodayString() {
+export function getTodayString() {
   const now = new Date()
   return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`
 }
@@ -17,6 +17,7 @@ function getTodayString() {
 export default function useTodo() {
   const [tasks, setTasks] = useLocalStorage('todo-tasks', [])
   const [lastDate, setLastDate] = useLocalStorage('todo-date', getTodayString())
+  const [history, setHistory] = useLocalStorage('todo-history', {})
   const [motivation] = useState(() =>
     MOTIVATIONS[Math.floor(Math.random() * MOTIVATIONS.length)],
   )
@@ -24,10 +25,28 @@ export default function useTodo() {
   useEffect(() => {
     const today = getTodayString()
     if (lastDate !== today) {
+      setHistory((prev) => ({
+        ...prev,
+        [lastDate]: {
+          total: tasks.length,
+          completed: tasks.filter((t) => t.completed).length,
+        },
+      }))
       setTasks((prev) => prev.map((t) => ({ ...t, completed: false })))
       setLastDate(today)
     }
-  }, [lastDate, setTasks, setLastDate])
+  }, []) // eslint-disable-line
+
+  useEffect(() => {
+    const today = getTodayString()
+    setHistory((prev) => ({
+      ...prev,
+      [today]: {
+        total: tasks.length,
+        completed: tasks.filter((t) => t.completed).length,
+      },
+    }))
+  }, [tasks, setHistory])
 
   const addTask = useCallback(
     (text) => {
@@ -65,5 +84,5 @@ export default function useTodo() {
     })
   }, [tasks])
 
-  return { tasks: sortedTasks, addTask, toggleTask, deleteTask, motivation }
+  return { tasks: sortedTasks, addTask, toggleTask, deleteTask, motivation, history }
 }
