@@ -68,7 +68,7 @@ export default function TaskItem({ task, onToggle, onUpdate, onDelete, isDraggin
       ref={setNodeRef}
       style={style}
       {...attributes}
-      className="bg-white rounded-2xl px-3 py-3 shadow-sm flex items-center gap-2 group transition-all"
+      className="bg-white rounded-2xl px-3 py-3.5 shadow-sm flex items-center gap-3 group transition-shadow hover:shadow-md"
     >
       <button
         {...listeners}

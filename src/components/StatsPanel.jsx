@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import {
   LineChart,
   Line,
@@ -8,6 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
+import { Flame, Trophy, ListTodo, CheckCircle2, ChevronDown } from 'lucide-react'
 import { getTodayString } from '../hooks/useTodo'
 
 function dateStr(year, month, day) {
@@ -19,14 +20,15 @@ function parseDate(str) {
   return new Date(y, m - 1, d)
 }
 
-function StatCard({ label, value, unit }) {
+function StatCard({ label, value, unit, icon: Icon, iconColor }) {
   return (
     <div className="bg-gray-50 rounded-xl p-3 text-center">
-      <p className="text-xl font-semibold text-gray-800">
+      <Icon size={16} className={`mx-auto mb-1 ${iconColor}`} />
+      <p className="text-lg font-semibold text-gray-800">
         {value}
-        <span className="text-xs text-gray-400 ml-0.5">{unit}</span>
+        <span className="text-[11px] text-gray-400 ml-0.5">{unit}</span>
       </p>
-      <p className="text-xs text-gray-400 mt-0.5">{label}</p>
+      <p className="text-[11px] text-gray-400 mt-0.5">{label}</p>
     </div>
   )
 }
@@ -108,11 +110,7 @@ function TrendChart({ history }) {
     for (let i = 13; i >= 0; i--) {
       const d = new Date(today)
       d.setDate(today.getDate() - i)
-      const key = dateStr(
-        d.getFullYear(),
-        d.getMonth() + 1,
-        d.getDate(),
-      )
+      const key = dateStr(d.getFullYear(), d.getMonth() + 1, d.getDate())
       const stats = history[key]
       const rate = stats && stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0
       result.push({
@@ -162,11 +160,17 @@ function TrendChart({ history }) {
           <Line
             type="monotone"
             dataKey="rate"
-            stroke="#14b8a6"
+            stroke="url(#chartGradient)"
             strokeWidth={2}
             dot={{ r: 3, fill: '#14b8a6', strokeWidth: 0 }}
             activeDot={{ r: 5, fill: '#14b8a6', strokeWidth: 2, stroke: '#fff' }}
           />
+          <defs>
+            <linearGradient id="chartGradient" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#2dd4bf" />
+              <stop offset="100%" stopColor="#0d9488" />
+            </linearGradient>
+          </defs>
         </LineChart>
       </ResponsiveContainer>
     </div>
@@ -174,6 +178,8 @@ function TrendChart({ history }) {
 }
 
 export default function StatsPanel({ history }) {
+  const [expanded, setExpanded] = useState(false)
+
   const stats = useMemo(() => {
     const entries = Object.entries(history)
     const todayStr = getTodayString()
@@ -205,56 +211,73 @@ export default function StatsPanel({ history }) {
     if (currentStreak > bestStreak) bestStreak = currentStreak
 
     if (todayStats.completed > 0) {
-      const yesterday = new Date()
-      yesterday.setDate(yesterday.getDate() - 1)
-      const yKey = dateStr(yesterday.getFullYear(), yesterday.getMonth() + 1, yesterday.getDate())
-      const yStats = history[yKey]
-      if (yStats && yStats.completed > 0) {
-        streak = 1
-        for (const date of sortedDates) {
-          const d = parseDate(date)
-          const todayD = parseDate(todayStr)
-          const diff = Math.floor((todayD - d) / (1000 * 60 * 60 * 24))
-          if (diff <= 0) continue
-          const dayStats = history[date]
-          if (dayStats && dayStats.completed > 0 && diff === streak) {
-            streak++
-          } else if (diff > streak) {
-            break
-          }
+      streak = 1
+      for (const date of sortedDates) {
+        const d = parseDate(date)
+        const todayD = parseDate(todayStr)
+        const diff = Math.floor((todayD - d) / (1000 * 60 * 60 * 24))
+        if (diff <= 0) continue
+        const dayStats = history[date]
+        if (dayStats && dayStats.completed > 0 && diff === streak) {
+          streak++
+        } else if (diff > streak) {
+          break
         }
-      } else {
-        streak = 1
       }
     }
 
     if (bestStreak < streak) bestStreak = streak
-
-    const overallRate =
-      totalTasks > 0 ? Math.round((totalCompleted / totalTasks) * 100) : 0
+    const overallRate = totalTasks > 0 ? Math.round((totalCompleted / totalTasks) * 100) : 0
 
     return { totalTasks, totalCompleted, overallRate, streak, bestStreak }
   }, [history])
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-6 space-y-5">
-      <h2 className="text-lg font-semibold text-gray-800">数据统计</h2>
+    <div className="bg-white rounded-2xl shadow-sm">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center justify-between p-5 cursor-pointer"
+      >
+        <h2 className="text-base font-semibold text-gray-800">数据统计</h2>
+        <div className="flex items-center gap-4">
+          <span className="text-xs text-gray-400">
+            <Flame size={12} className="inline mr-0.5 text-orange-400" />
+            {stats.streak}天
+          </span>
+          <span className="text-xs text-gray-400">
+            <CheckCircle2 size={12} className="inline mr-0.5 text-teal-400" />
+            {stats.totalCompleted}
+          </span>
+          <ChevronDown
+            size={16}
+            className={`text-gray-300 transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
+          />
+        </div>
+      </button>
 
-      <div className="grid grid-cols-2 gap-3">
-        <StatCard label="连续打卡" value={stats.streak} unit="天" />
-        <StatCard label="最长连续" value={stats.bestStreak} unit="天" />
-        <StatCard label="累计任务" value={stats.totalTasks} unit="项" />
-        <StatCard label="累计完成" value={stats.totalCompleted} unit="项" />
-      </div>
+      <div
+        className={`overflow-hidden transition-all duration-300 ${
+          expanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="px-5 pb-5 space-y-5">
+          <div className="grid grid-cols-2 gap-3">
+            <StatCard label="连续打卡" value={stats.streak} unit="天" icon={Flame} iconColor="text-orange-400" />
+            <StatCard label="最长连续" value={stats.bestStreak} unit="天" icon={Trophy} iconColor="text-amber-400" />
+            <StatCard label="累计任务" value={stats.totalTasks} unit="项" icon={ListTodo} iconColor="text-teal-400" />
+            <StatCard label="累计完成" value={stats.totalCompleted} unit="项" icon={CheckCircle2} iconColor="text-teal-400" />
+          </div>
 
-      <div>
-        <h3 className="text-sm font-medium text-gray-500 mb-3">打卡日历</h3>
-        <CalendarHeatmap history={history} todayStr={getTodayString()} />
-      </div>
+          <div>
+            <h3 className="text-sm font-medium text-gray-500 mb-3">打卡日历</h3>
+            <CalendarHeatmap history={history} todayStr={getTodayString()} />
+          </div>
 
-      <div>
-        <h3 className="text-sm font-medium text-gray-500 mb-3">近两周趋势</h3>
-        <TrendChart history={history} />
+          <div>
+            <h3 className="text-sm font-medium text-gray-500 mb-3">近两周趋势</h3>
+            <TrendChart history={history} />
+          </div>
+        </div>
       </div>
     </div>
   )

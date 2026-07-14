@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
@@ -24,6 +25,7 @@ export default function TaskList({
   hasIncomplete,
   categoryFilter,
   onCategoryFilter,
+  onCelebrate,
 }) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 
@@ -33,6 +35,15 @@ export default function TaskList({
 
   const incompleteIds = filteredTasks.filter((t) => !t.completed).map((t) => t.id)
   const completedIds = filteredTasks.filter((t) => t.completed).map((t) => t.id)
+
+  const prevIncompleteRef = useRef(incompleteIds.length)
+
+  useEffect(() => {
+    if (prevIncompleteRef.current > 0 && incompleteIds.length === 0 && filteredTasks.length > 0) {
+      onCelebrate?.()
+    }
+    prevIncompleteRef.current = incompleteIds.length
+  }, [incompleteIds.length, filteredTasks.length, onCelebrate])
 
   function handleDragEnd(event) {
     const { active, over } = event
@@ -47,7 +58,7 @@ export default function TaskList({
     onReorder(updated)
   }
 
-  const showBatchBar = hasCompleted || (hasIncomplete && filteredTasks.length > 1)
+  const showBatchBar = tasks.length > 1
 
   if (tasks.length === 0) {
     return (
@@ -70,8 +81,8 @@ export default function TaskList({
             onClick={() => onCategoryFilter(cat.key === categoryFilter ? null : cat.key)}
             className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
               categoryFilter === cat.key
-                ? 'bg-teal-500 text-white shadow-sm'
-                : 'bg-white text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                ? 'bg-teal-500 text-white shadow-md'
+                : 'bg-white text-gray-400 hover:text-gray-600 hover:bg-gray-50 shadow-sm'
             }`}
           >
             {cat.label}
@@ -109,7 +120,7 @@ export default function TaskList({
         modifiers={[restrictToVerticalAxis]}
       >
         <SortableContext items={incompleteIds} strategy={verticalListSortingStrategy}>
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {filteredTasks.length === 0 ? (
               <p className="text-center text-gray-300 text-sm py-8">该分类下暂无任务</p>
             ) : (
@@ -131,7 +142,7 @@ export default function TaskList({
         </SortableContext>
 
         {completedIds.length > 0 && (
-          <div className="mt-3 space-y-2">
+          <div className="mt-4 space-y-2.5">
             {incompleteIds.length > 0 && (
               <p className="text-xs text-gray-300 pl-1">已完成 ({completedIds.length})</p>
             )}
